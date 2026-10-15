@@ -7,7 +7,6 @@ import mimetypes
 import re
 import sqlite3
 from pathlib import Path
-
 import numpy as np
 import pandas as pd
 import plotly.express as px
@@ -39,12 +38,12 @@ PLAYER_IMAGES = {
 }
 DEFAULT_PLAYER_IMAGE = IMAGE_DIR / "unknown_player_image.png"
 
-BLUE = "#4F7DFF"
-CYAN = "#79D5FF"
-GREEN = "#55D6A2"
-PALE = "#C8D1E1"
-MUTED = "#98A4B9"
-GRID = "rgba(210,224,246,.085)"
+BLUE = "#E5252A"
+CYAN = "#F56D75"
+GREEN = "#F56D75"
+PALE = "#F3F3F5"
+MUTED = "#A5A8B0"
+GRID = "rgba(243,243,245,.085)"
 PHASES = ["Powerplay", "Middle", "Death"]
 CREDITED = {
     "caught", "bowled", "lbw", "caught and bowled",
@@ -66,17 +65,17 @@ st.markdown(r"""
 @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 :root {
-  --bg:#11151c; --panel:#202630; --panel2:#29313e;
-  --blue:#4f7dff; --text:#f2f5fb; --muted:#98a4b9;
+  --bg:#1C1111; --panel:#302120; --panel2:#3E2A29;
+  --blue:#E5252A; --text:#f2f5fb; --muted:#98a4b9;
   --line:rgba(220,230,248,.09);
 }
 .stApp {
   color:var(--text);
   font-family:'DM Sans',sans-serif;
   background:
-    radial-gradient(ellipse at 76% -8%,rgba(61,99,223,.21),transparent 34%),
-    radial-gradient(ellipse at 8% 45%,rgba(54,81,141,.09),transparent 38%),
-    linear-gradient(135deg,#10141b,#171c26 53%,#10141a);
+    radial-gradient(ellipse at 76% -8%,rgba(223,61,74,.21),transparent 34%),
+    radial-gradient(ellipse at 8% 45%,rgba(141,54,61,.09),transparent 38%),
+    linear-gradient(135deg,#1B1010,#261817 53%,#1A1010);
 }
 header[data-testid="stHeader"] {background:transparent}
 #MainMenu,footer {visibility:hidden}
@@ -86,17 +85,17 @@ h1 {font-size:clamp(1.7rem,3vw,2.8rem)!important;line-height:1.05!important}
 h2 {font-size:1.4rem!important}
 [data-testid="stCaptionContainer"] p {color:var(--muted)!important;font-size:.78rem}
 section[data-testid="stSidebar"] {
-  background:linear-gradient(180deg,#151a24,#12161e);
+  background:linear-gradient(180deg,#241515,#1E1212);
   border-right:1px solid rgba(219,230,255,.08);
 }
 .brand {
-  padding:15px;margin-bottom:16px;border:1px solid rgba(112,145,255,.24);
-  border-radius:13px;background:linear-gradient(135deg,rgba(42,75,177,.48),#192132);
+  padding:15px;margin-bottom:16px;border:1px solid rgba(255,112,124,.24);
+  border-radius:13px;background:linear-gradient(135deg,rgba(177,42,53,.48),#321A19);
 }
 .brand-name {font:700 21px 'Space Grotesk',sans-serif;letter-spacing:-.05em}
-.brand-sub {color:#a9bce8;font:9px 'DM Mono',monospace;letter-spacing:.12em;margin-top:4px}
+.brand-sub {color:#E8A9AE;font:9px 'DM Mono',monospace;letter-spacing:.12em;margin-top:4px}
 .sidebar-heading {
-  font:500 9px 'DM Mono',monospace;letter-spacing:.16em;color:#697588;
+  font:500 9px 'DM Mono',monospace;letter-spacing:.16em;color:#88696C;
   margin:18px 8px 7px;text-transform:uppercase
 }
 .sidebar-team {display:flex;justify-content:space-between;padding:5px 8px;color:#bec6d4;font-size:11px}
@@ -111,32 +110,32 @@ section[data-testid="stSidebar"] {
   position:relative;isolation:isolate;overflow:hidden;
   display:flex;align-items:center;justify-content:space-between;gap:20px;
   min-height:160px;margin:7px 0 18px;padding:22px 27px;
-  border:1px solid rgba(132,160,240,.25);border-radius:16px;
+  border:1px solid rgba(240,132,141,.25);border-radius:16px;
   background:
-    radial-gradient(ellipse at 78% 45%,rgba(28,112,183,.20),transparent 32%),
-    radial-gradient(ellipse at 14% 115%,rgba(64,91,214,.24),transparent 48%),
-    linear-gradient(115deg,#101b31,#172944 44%,#101b2a);
+    radial-gradient(ellipse at 78% 45%,rgba(183,28,41,.20),transparent 32%),
+    radial-gradient(ellipse at 14% 115%,rgba(214,64,76,.24),transparent 48%),
+    linear-gradient(115deg,#311110,#441917 44%,#2A1110);
   box-shadow:0 20px 48px rgba(0,0,0,.3);
   animation:heroDrift 16s ease-in-out infinite alternate;
 }
 .hero:before {
   content:'';position:absolute;inset:-40%;z-index:0;pointer-events:none;
-  background:repeating-linear-gradient(132deg,transparent 0 34px,rgba(121,151,255,.045) 34px 36px,transparent 36px 70px);
+  background:repeating-linear-gradient(132deg,transparent 0 34px,rgba(255,121,132,.045) 34px 36px,transparent 36px 70px);
   animation:gridDrift 30s linear infinite
 }
 .hero > div {position:relative;z-index:1}
 .hero-atmosphere {position:absolute!important;inset:0;pointer-events:none;overflow:hidden;z-index:0!important}
 .hero-beam {
   position:absolute;top:-80%;height:260%;width:2px;
-  background:linear-gradient(180deg,transparent,rgba(104,190,255,.6),rgba(91,126,255,.08),transparent);
+  background:linear-gradient(180deg,transparent,rgba(255,104,117,.6),rgba(255,91,105,.08),transparent);
   opacity:0;transform:rotate(28deg);animation:beamTravel 9s linear infinite
 }
 .hero-beam.b1 {left:18%;animation-delay:-2s}
 .hero-beam.b2 {left:56%;animation-delay:-6s;animation-duration:13s}
 .hero-beam.b3 {left:83%;animation-delay:-9s;animation-duration:11s}
 .hero-particle {
-  position:absolute;width:3px;height:3px;border-radius:50%;background:#b9eaff;
-  box-shadow:0 0 8px 2px rgba(81,168,255,.7);
+  position:absolute;width:3px;height:3px;border-radius:50%;background:#FFB9BF;
+  box-shadow:0 0 8px 2px rgba(255,81,95,.7);
   animation:particleFloat 7s ease-in-out infinite
 }
 .hero-particle.p1 {left:38%;top:28%}
@@ -144,59 +143,59 @@ section[data-testid="stSidebar"] {
 .hero-particle.p3 {left:68%;top:19%;animation-delay:-3s}
 .hero-particle.p4 {left:91%;top:68%;animation-delay:-4s}
 .hero-particle.p5 {left:76%;top:84%;animation-delay:-5s}
-.hero-eyebrow {color:#9ab4ff;font:500 9px 'DM Mono',monospace;letter-spacing:.21em}
+.hero-eyebrow {color:#FF9AA2;font:500 9px 'DM Mono',monospace;letter-spacing:.21em}
 .hero-title {
   color:#f3f6ff;font:700 clamp(23px,3vw,36px) 'Space Grotesk',sans-serif;
   line-height:1.08;margin-top:7px;letter-spacing:-.055em
 }
-.hero-title span {color:#82a4ff}
+.hero-title span {color:#F56D75}
 .hero-copy {font-size:11px;color:#a4afc3;line-height:1.6;max-width:650px;margin-top:9px}
 .hero-stats {display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}
 .hero-pill {
-  border:1px solid rgba(170,192,247,.17);border-radius:99px;padding:6px 9px;
-  background:rgba(8,15,29,.23);color:#c0cce1;font:9px 'DM Mono',monospace
+  border:1px solid rgba(247,170,176,.17);border-radius:99px;padding:6px 9px;
+  background:rgba(29,9,8,.23);color:#c0cce1;font:9px 'DM Mono',monospace
 }
-.hero-pill b {color:#9db7ff;font-weight:500}
+.hero-pill b {color:#FF9DA5;font-weight:500}
 .field-stage {
   position:relative;flex:0 0 clamp(220px,28%,340px);height:145px;
   perspective:900px;isolation:isolate;overflow:visible
 }
 .field-aura {
   position:absolute;inset:10px 8px 18px;
-  background:radial-gradient(ellipse,rgba(65,119,255,.19),transparent 68%);
+  background:radial-gradient(ellipse,rgba(255,65,81,.19),transparent 68%);
   filter:blur(9px);animation:aura 5s ease-in-out infinite alternate
 }
 .field-map {
   position:absolute;left:7%;top:4%;width:86%;height:85%;
   border-radius:48% / 43%;transform:rotateX(56deg) rotateZ(-19deg);
-  transform-style:preserve-3d;background:linear-gradient(145deg,#1c4c48,#12312f 55%,#0d2529);
-  border:1px solid rgba(105,176,255,.68);
-  box-shadow:0 8px 0 #0a1825,0 16px 25px rgba(0,0,0,.45);
+  transform-style:preserve-3d;background:linear-gradient(145deg,#1c4c48,#12312f 55%,#290E0D);
+  border:1px solid rgba(255,105,117,.68);
+  box-shadow:0 8px 0 #250B0A,0 16px 25px rgba(0,0,0,.45);
   animation:fieldHover 7s ease-in-out infinite
 }
 .field-map:before {
-  content:'';position:absolute;inset:5%;border:1px solid rgba(151,214,255,.42);
-  border-radius:48% / 43%;box-shadow:inset 0 0 20px rgba(69,148,255,.11)
+  content:'';position:absolute;inset:5%;border:1px solid rgba(255,151,160,.42);
+  border-radius:48% / 43%;box-shadow:inset 0 0 20px rgba(255,69,84,.11)
 }
 .field-map:after {
-  content:'';position:absolute;inset:14% 24%;border:1px solid rgba(109,194,255,.5);
-  border-radius:48% / 43%;background:rgba(68,129,255,.08)
+  content:'';position:absolute;inset:14% 24%;border:1px solid rgba(255,109,121,.5);
+  border-radius:48% / 43%;background:rgba(255,68,84,.08)
 }
 .field-lines {position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .field-zone {position:absolute;z-index:2;border-radius:50%;filter:blur(.2px)}
 .field-zone.power {
   left:12%;top:24%;width:26%;height:35%;
-  background:radial-gradient(ellipse,rgba(76,125,255,.4),transparent 70%);
+  background:radial-gradient(ellipse,rgba(255,76,91,.4),transparent 70%);
   animation:zonePulse 3s ease-in-out infinite
 }
 .field-zone.death {
   right:11%;bottom:15%;width:27%;height:33%;
-  background:radial-gradient(ellipse,rgba(91,212,255,.3),transparent 70%);
+  background:radial-gradient(ellipse,rgba(255,91,105,.3),transparent 70%);
   animation:zonePulse 4s ease-in-out infinite reverse
 }
 .delivery {
   position:absolute;z-index:5;width:7px;height:7px;border-radius:50%;
-  background:#d8f5ff;border:1px solid white;box-shadow:0 0 12px #4f7dff;
+  background:#d8f5ff;border:1px solid white;box-shadow:0 0 12px #E5252A;
   animation:zonePulse 2s ease-in-out infinite
 }
 .delivery.d1 {left:27%;top:39%}
@@ -205,87 +204,87 @@ section[data-testid="stSidebar"] {
 .delivery.d4 {left:61%;top:69%;width:5px;height:5px}
 .delivery-trail {
   position:absolute;z-index:4;left:29%;top:42%;width:43%;height:2px;
-  transform:rotate(18deg);background:linear-gradient(90deg,transparent,#73d4ff,transparent);
+  transform:rotate(18deg);background:linear-gradient(90deg,transparent,#FF737F,transparent);
   animation:trail 3s ease-in-out infinite
 }
-.field-label {position:absolute;right:0;bottom:0;color:#7e9ad5;font:8px 'DM Mono',monospace;letter-spacing:.1em;text-align:right}
-.field-coord {position:absolute;left:0;top:0;color:#99b8ff;font:7px 'DM Mono',monospace}
+.field-label {position:absolute;right:0;bottom:0;color:#D57E85;font:8px 'DM Mono',monospace;letter-spacing:.1em;text-align:right}
+.field-coord {position:absolute;left:0;top:0;color:#FF99A1;font:7px 'DM Mono',monospace}
 .section-head {display:flex;justify-content:space-between;align-items:flex-end;gap:12px;margin:19px 0 10px}
 .section-title {font:600 15px 'Space Grotesk',sans-serif;color:#f0f4fb}
 .section-sub {font-size:10px;color:#8f99ab;margin-top:3px}
-.section-tag {font:9px 'DM Mono',monospace;color:#789aff;letter-spacing:.12em;white-space:nowrap}
+.section-tag {font:9px 'DM Mono',monospace;color:#FF7883;letter-spacing:.12em;white-space:nowrap}
 .kpi {
   min-height:86px;padding:12px 14px;border-radius:11px;
   border:1px solid rgba(223,233,250,.08);
-  background:linear-gradient(140deg,#2a303a,#20242c);
+  background:linear-gradient(140deg,#3A2B2A,#2C2020);
   animation:cardIn .4s both
 }
 .kpi-label {font:9px 'DM Mono',monospace;letter-spacing:.09em;color:#96a1b3;text-transform:uppercase}
 .kpi-value {font:600 clamp(1.15rem,1.6vw,1.55rem) 'Space Grotesk',sans-serif;color:#f2f5fb;margin-top:6px}
-.kpi-value.blue {color:#82a4ff}
+.kpi-value.blue {color:#F56D75}
 .kpi-value.green {color:#65d9ab}
 .kpi-detail {font-size:9px;color:#7f8b9e;margin-top:4px}
 .profile-card {
-  border:1px solid rgba(112,148,241,.24);border-radius:15px;padding:14px;
-  background:linear-gradient(132deg,#202a3e,#1c2c4b 47%,#17202d);
+  border:1px solid rgba(241,112,123,.24);border-radius:15px;padding:14px;
+  background:linear-gradient(132deg,#3E2120,#4B1E1C 47%,#2D1817);
   box-shadow:0 18px 40px rgba(0,0,0,.25)
 }
 .profile-image {
   width:100%;height:205px;object-fit:contain;object-position:center bottom;
-  border-radius:10px;display:block;background:linear-gradient(180deg,#202f4a,#161d29)
+  border-radius:10px;display:block;background:linear-gradient(180deg,#4A2120,#291716)
 }
 .profile-name {color:#f4f6fb;font:600 clamp(1.25rem,1.8vw,1.75rem) 'Space Grotesk',sans-serif}
 .profile-sub {font-size:11px;color:#bac9e7;margin-top:4px}
 .chip {
-  display:inline-block;border:1px solid rgba(137,170,255,.26);border-radius:99px;
-  padding:4px 8px;color:#b8cbff;background:rgba(74,111,216,.12);
+  display:inline-block;border:1px solid rgba(255,137,147,.26);border-radius:99px;
+  padding:4px 8px;color:#FFB8BE;background:rgba(216,74,86,.12);
   font:9px 'DM Mono',monospace;margin-top:8px
 }
-.fact-label {font:9px 'DM Mono',monospace;color:#8fa2c5;letter-spacing:.1em;margin-top:10px}
+.fact-label {font:9px 'DM Mono',monospace;color:#C58F93;letter-spacing:.1em;margin-top:10px}
 .fact {font-size:11px;color:#e2e9f8;margin-top:3px}
 .profile-stats {
   display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
-  margin-top:13px;background:rgba(10,17,29,.32);
-  border:1px solid rgba(165,191,255,.13);border-radius:10px;overflow:hidden
+  margin-top:13px;background:rgba(29,11,10,.32);
+  border:1px solid rgba(255,165,172,.13);border-radius:10px;overflow:hidden
 }
-.profile-stat {padding:8px;border-right:1px solid rgba(165,191,255,.12)}
+.profile-stat {padding:8px;border-right:1px solid rgba(255,165,172,.12)}
 .profile-stat:last-child {border-right:0}
-.profile-stat-label {font-size:9px;color:#a5b4d2}
+.profile-stat-label {font-size:9px;color:#D2A5A9}
 .profile-stat-value {font:600 16px 'Space Grotesk',sans-serif;color:#f5f7fc;margin-top:3px}
 .chart-panel {
   border:1px solid rgba(225,234,249,.075);border-radius:12px;
-  background:linear-gradient(145deg,rgba(42,46,55,.95),rgba(31,35,42,.98));
+  background:linear-gradient(145deg,rgba(55,42,42,.95),rgba(42,31,31,.98));
   padding:4px;box-shadow:0 12px 26px rgba(0,0,0,.14)
 }
 [data-testid="stPlotlyChart"] {border-radius:9px}
 .player-tile {
   border:1px solid rgba(223,233,250,.09);border-radius:13px;
-  background:linear-gradient(145deg,#252d3b,#1a202b);padding:10px;
+  background:linear-gradient(145deg,#3B2625,#2B1B1A);padding:10px;
   transition:transform .2s,border-color .2s
 }
-.player-tile:hover {transform:translateY(-3px);border-color:rgba(104,145,255,.5)}
+.player-tile:hover {transform:translateY(-3px);border-color:rgba(255,104,117,.5)}
 .tile-image {
   width:100%;height:132px;object-fit:contain;object-position:center bottom;
-  border-radius:9px;background:linear-gradient(180deg,#202f4a,#161d29);display:block
+  border-radius:9px;background:linear-gradient(180deg,#4A2120,#291716);display:block
 }
 .tile-name {font:600 13px 'Space Grotesk',sans-serif;color:#f2f5fb;margin:9px 0 3px}
-.tile-meta {font:9px 'DM Mono',monospace;color:#9aadd8}
+.tile-meta {font:9px 'DM Mono',monospace;color:#D89A9F}
 .tile-stats {font-size:10px;color:#b6c1d3;margin:8px 0}
 .stButton button {
-  background:#436df0;color:white;border:1px solid rgba(159,183,255,.20);
+  background:#E5252A;color:white;border:1px solid rgba(255,159,167,.20);
   border-radius:8px;font-weight:600;transition:transform .18s,box-shadow .18s
 }
-.stButton button:hover {background:#5b81fb;color:white;transform:translateY(-1px)}
+.stButton button:hover {background:#F56D75;color:white;transform:translateY(-1px)}
 div[data-baseweb="select"]>div,div[data-baseweb="input"]>div {
-  background:#252a33;border-color:#3b424e;border-radius:8px;min-height:37px
+  background:#332525;border-color:#4E3C3B;border-radius:8px;min-height:37px
 }
 label {color:#b6c0d0!important;font-size:10px!important}
 .insight {
-  border:1px solid rgba(96,138,255,.21);border-radius:11px;
-  background:linear-gradient(110deg,rgba(63,100,211,.13),rgba(35,41,51,.7));
+  border:1px solid rgba(255,96,109,.21);border-radius:11px;
+  background:linear-gradient(110deg,rgba(211,63,75,.13),rgba(51,36,35,.7));
   padding:11px 14px;color:#c2cad7;font-size:11px;line-height:1.55;margin:5px 0 13px
 }
-.insight strong {color:#9fbbff}
+.insight strong {color:#FF9FA7}
 hr {border-color:rgba(220,230,248,.09)!important}
 @keyframes heroDrift {from{background-position:0 0}to{background-position:100% 50%}}
 @keyframes gridDrift {from{transform:translateX(0)}to{transform:translateX(70px)}}
@@ -653,7 +652,7 @@ def style_chart(fig: go.Figure, height: int = 300, legend: bool = True):
             font=dict(size=9, color="#AFBACB"),
         ),
         hoverlabel=dict(
-            bgcolor="#20242C", bordercolor=BLUE,
+            bgcolor="#2C2020", bordercolor=BLUE,
             font=dict(color="#F2F5FA"),
         ),
     )
@@ -731,7 +730,7 @@ def tile_image_html(name: str) -> str:
         return (
             '<div class="tile-image" style="display:flex;align-items:center;'
             'justify-content:center;font:600 36px Space Grotesk,sans-serif;'
-            f'color:#b9ccff">{html.escape(initials)}</div>'
+            f'color:#FFB9BF">{html.escape(initials)}</div>'
         )
 
     mime, encoded = encoded_image(str(path), path.stat().st_mtime)
@@ -746,8 +745,7 @@ def profile_image_html(name: str) -> str:
         'class="tile-image"', 'class="profile-image"'
     )
 
-
-# ------------------------- LOAD DATABASE --------------------
+    # ------------------------- LOAD DATABASE --------------------
 
 if not DB_PATH.is_file():
     st.error(f"Database not found: {DB_PATH}. Keep ipl.db beside Dashboard.py.")
@@ -829,7 +827,7 @@ with st.sidebar:
         '<div class="sidebar-heading">Popular teams</div>',
         unsafe_allow_html=True,
     )
-    team_colors = [BLUE, "#8D79FF", GREEN, CYAN, "#E0B568"]
+    team_colors = [BLUE, "#FF7984", GREEN, CYAN, "#E0B568"]
     for index, team in enumerate(teams[:7]):
         st.markdown(
             f'<div class="sidebar-team"><span>'
@@ -842,7 +840,7 @@ with st.sidebar:
         unsafe_allow_html=True,
     )
     st.markdown(
-        f'<div style="padding:5px 8px;color:#7f8ca1;font-size:10px;line-height:1.7">'
+        f'<div style="padding:5px 8px;color:#A17F82;font-size:10px;line-height:1.7">'
         f'<b style="color:#c6d0e1">ipl.db</b><br>{len(data):,} deliveries'
         f'<br>{len(seasons)} seasons</div>',
         unsafe_allow_html=True,
@@ -854,7 +852,7 @@ header_left, header_season = st.columns([2.2, 1.0])
 with header_left:
     st.markdown(
         f'<div class="topline"><span>Home '
-        f'<span style="color:#526078;padding:0 8px">›</span>'
+        f'<span style="color:#785255;padding:0 8px">›</span>'
         f'<strong>{html.escape(current_page)}</strong></span>'
         f'<span>LOCAL DATABASE · IPL BOWLING INTELLIGENCE</span></div>',
         unsafe_allow_html=True,
@@ -898,13 +896,13 @@ st.markdown(
         <span class="delivery d1"></span><span class="delivery d2"></span>
         <span class="delivery d3"></span><span class="delivery d4"></span>
         <svg class="field-lines" viewBox="0 0 320 180" preserveAspectRatio="none">
-          <ellipse cx="160" cy="90" rx="145" ry="80" fill="none" stroke="rgba(174,214,255,.62)" stroke-width="1.3"/>
-          <ellipse cx="160" cy="90" rx="105" ry="58" fill="none" stroke="rgba(125,188,255,.42)" stroke-width="1"/>
-          <path d="M160 26 L160 154 M52 90 L268 90" stroke="rgba(154,208,255,.28)" stroke-width="1" stroke-dasharray="3 5"/>
+          <ellipse cx="160" cy="90" rx="145" ry="80" fill="none" stroke="rgba(255,174,181,.62)" stroke-width="1.3"/>
+          <ellipse cx="160" cy="90" rx="105" ry="58" fill="none" stroke="rgba(255,125,136,.42)" stroke-width="1"/>
+          <path d="M160 26 L160 154 M52 90 L268 90" stroke="rgba(255,154,162,.28)" stroke-width="1" stroke-dasharray="3 5"/>
           <rect x="143" y="67" width="34" height="46" rx="2" fill="rgba(204,220,180,.2)" stroke="rgba(212,237,255,.8)" stroke-width="1.3"/>
           <path d="M145 73 H175 M145 107 H175 M151 67 V113 M169 67 V113" stroke="rgba(225,239,255,.52)" stroke-width="1"/>
-          <circle cx="160" cy="90" r="5" fill="rgba(114,212,255,.28)" stroke="#9de5ff" stroke-width="1.4"/>
-          <circle cx="160" cy="90" r="12" fill="none" stroke="rgba(115,212,255,.25)" stroke-width="1" stroke-dasharray="2 3"/>
+          <circle cx="160" cy="90" r="5" fill="rgba(255,114,126,.28)" stroke="#FF9DA5" stroke-width="1.4"/>
+          <circle cx="160" cy="90" r="12" fill="none" stroke="rgba(255,115,127,.25)" stroke-width="1" stroke-dasharray="2 3"/>
         </svg>
       </div>
       <div class="field-label">FIELD ZONES · DELIVERY TRACKING<br>POWERPLAY / MIDDLE / DEATH</div>
@@ -982,7 +980,7 @@ if current_page == "Players":
                     f'''<div class="profile-card">
                     <div style="display:grid;grid-template-columns:minmax(140px,.68fr) minmax(0,1.5fr);gap:16px;align-items:stretch">
                       <div>{image_html}
-                        <div style="font:9px 'DM Mono',monospace;color:#9bb3eb;letter-spacing:.12em;margin-top:8px">PLAYER PROFILE</div>
+                        <div style="font:9px 'DM Mono',monospace;color:#EB9BA2;letter-spacing:.12em;margin-top:8px">PLAYER PROFILE</div>
                       </div>
                       <div>
                         <div class="profile-name">{html.escape(selected)}</div>
@@ -1023,7 +1021,7 @@ if current_page == "Players":
                         r=values + [values[0]],
                         theta=labels + [labels[0]],
                         fill="toself",
-                        fillcolor="rgba(79,125,255,.22)",
+                        fillcolor="rgba(255,79,94,.22)",
                         line=dict(color=BLUE, width=2),
                         marker=dict(color=CYAN, size=5),
                         hovertemplate="%{theta}<br>Index %{r:.0f}/100<extra></extra>",
@@ -1035,7 +1033,7 @@ if current_page == "Players":
                         radialaxis=dict(
                             visible=True, range=[0, 100],
                             tickvals=[25, 50, 75, 100],
-                            tickfont=dict(size=7, color="#8592A8"),
+                            tickfont=dict(size=7, color="#A88588"),
                             gridcolor=GRID, linecolor=GRID,
                         ),
                         angularaxis=dict(
@@ -1049,6 +1047,7 @@ if current_page == "Players":
 
             metric_a, metric_b, metric_c, metric_d = st.columns(4, gap="small")
             with metric_a:
+
                 kpi("Legal balls", f"{total_balls:,}", selected_season, "blue")
             with metric_b:
                 kpi("Economy", f"{econ:.2f}", "Runs per six legal balls", "blue")
@@ -1176,7 +1175,7 @@ if current_page == "Players":
                         opponents, x="Economy", y="batting_team",
                         orientation="h", color="Economy",
                         color_continuous_scale=[
-                            [0, BLUE], [.55, "#62708D"], [1, "#343A46"]
+                            [0, BLUE], [.55, "#8D6266"], [1, "#463534"]
                         ],
                         custom_data=["Balls", "Wickets"],
                     )
@@ -1244,7 +1243,7 @@ if current_page == "Players":
                     venues, x="Economy", y="venue", orientation="h",
                     color="Economy",
                     color_continuous_scale=[
-                        [0, BLUE], [.55, "#62708D"], [1, "#343A46"]
+                        [0, BLUE], [.55, "#8D6266"], [1, "#463534"]
                     ],
                     custom_data=["Balls", "Wickets"],
                 )
@@ -1368,6 +1367,7 @@ if current_page == "Players":
 
                 for col, (_, row) in zip(columns, batch.iterrows()):
                     name = str(row["bowler"])
+
 
                     with col:
                         player_styles = (
@@ -1545,7 +1545,7 @@ else:
                 style_stats, x="Economy", y="bowler_style", orientation="h",
                 color="Economy",
                 color_continuous_scale=[
-                    [0, BLUE], [.55, "#7186B7"], [1, "#39404D"]
+                    [0, BLUE], [.55, "#B77177"], [1, "#4D3A39"]
                 ],
                 custom_data=["Balls", "Wickets"],
             )
@@ -1589,7 +1589,7 @@ else:
         fig = px.bar(
             phase_wickets, x="phase", y="Wickets", color="phase",
             color_discrete_map={
-                "Powerplay": BLUE, "Middle": "#8297C5", "Death": "#CAD2DF"
+                "Powerplay": BLUE, "Middle": "#C58288", "Death": "#F3F3F5"
             },
             custom_data=["Balls"], category_orders={"phase": PHASES},
         )
@@ -1649,7 +1649,7 @@ else:
                 season_trend, x="Season", y="Economy", color="Series",
                 line_dash="Series", markers=True,
                 color_discrete_map={
-                    "All bowlers": BLUE, "Qualified 500+": "#C3CCDA"
+                    "All bowlers": BLUE, "Qualified 500+": "#F3F3F5"
                 },
                 line_dash_map={
                     "All bowlers": "solid", "Qualified 500+": "dot"
@@ -1704,7 +1704,7 @@ else:
         st.markdown(
             f'<div class="insight"><strong>SPIN VS PACE</strong> &nbsp; '
             f'{html.escape(test["text"])}<br>'
-            f'<span style="color:#8997ad;font:9px DM Mono,monospace">'
+            f'<span style="color:#AD898C;font:9px DM Mono,monospace">'
             f'Cliff’s δ {test["delta"]:+.3f} · spin n={test["n_spin"]:,} · '
             f'pace n={test["n_pace"]:,}. Exploratory comparison, not causal evidence.'
             f'</span></div>',
@@ -1720,8 +1720,9 @@ else:
 st.divider()
 st.markdown(
     f'<div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;'
-    f'color:#6f7b91;font:9px DM Mono,monospace;letter-spacing:.09em">'
+    f'color:#916F72;font:9px DM Mono,monospace;letter-spacing:.09em">'
     f'<span>IPL 360 · BOWLING INTELLIGENCE</span>'
     f'<span>{len(data):,} DELIVERIES · LOCAL SQLITE</span></div>',
     unsafe_allow_html=True,
 )
+
